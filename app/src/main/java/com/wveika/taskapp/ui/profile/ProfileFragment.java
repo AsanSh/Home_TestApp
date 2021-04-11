@@ -22,33 +22,46 @@ import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment {
 
-    Button btnSelect;
+
     ImageView imageView;
-    private static final int PICK_IMAGE = 100;
+    private static final int GALLERY_REQUEST_CODE = 123;
+
     Uri imageUri;
     private ProfileViewModel profileViewModel;
+    Button btnSelect;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState, Intent data) {
+                             ViewGroup container, Bundle savedInstanceState) {
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        root.findViewById(R.id.btnSelect).setOnClickListener(v -> {
+            selectImageFromGallery_btn();
+        });
         root.findViewById(R.id.imageView).setOnClickListener(v -> {
-
-            setImage();
+            selectImageFromGallery_iv();
         });
         return root;
     }
 
-
-    private void setImage() {
-        Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-        startActivityForResult(gallery, PICK_IMAGE);
+    private void selectImageFromGallery_btn() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, GALLERY_REQUEST_CODE);
     }
+
+    private void selectImageFromGallery_iv() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, GALLERY_REQUEST_CODE);
+
+    }
+
     @Override
-     public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE){
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             imageUri = data.getData();
             imageView.setImageURI(imageUri);
         }
